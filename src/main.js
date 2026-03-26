@@ -234,8 +234,18 @@ const leadForm = document.getElementById('leadForm');
 
 // Show modal after 10 seconds if not already claimed/closed
 if (leadMagnet && !localStorage.getItem('leadMagnetSeen')) {
+  // Exit Intent logic (Desktop)
+  document.addEventListener('mouseleave', (e) => {
+    if (e.clientY < 0 && !leadMagnet.classList.contains('active')) {
+      leadMagnet.classList.add('active');
+    }
+  });
+
+  // Keep the 10 seconds fallback
   setTimeout(() => {
-    leadMagnet.classList.add('active');
+    if (!leadMagnet.classList.contains('active')) {
+      leadMagnet.classList.add('active');
+    }
   }, 10000);
 }
 
@@ -417,7 +427,7 @@ if (reviewsLink) {
     window.dataLayer.push({
       'event': 'google_reviews_click',
       'rating': '4.9',
-      'review_count': '517'
+      'review_count': '551'
     });
   });
 }
@@ -481,3 +491,71 @@ trackableSections.forEach(section => {
     sectionObserver.observe(element);
   }
 });
+
+// Dynamic Spots Logic
+const dynamicSpots = document.getElementById('dynamic-spots');
+if (dynamicSpots) {
+  const dayOfWeek = new Date().getDay(); // 0 is Sunday, 1 is Monday...
+  let spots = 2;
+  if (dayOfWeek === 1) spots = 4;
+  else if (dayOfWeek === 2) spots = 3;
+  else if (dayOfWeek === 3 || dayOfWeek === 4) spots = 2;
+  else spots = 1;
+  dynamicSpots.textContent = spots;
+}
+
+// Sticky Mobile CTA Visibility
+const stickyMobileCta = document.getElementById('stickyMobileCta');
+if (stickyMobileCta) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      stickyMobileCta.classList.add('visible');
+    } else {
+      stickyMobileCta.classList.remove('visible');
+    }
+  });
+}
+
+// Social Proof Toast Logic
+const toast = document.getElementById('socialProofToast');
+const toastName = document.getElementById('toastName');
+const toastPlan = document.getElementById('toastPlan');
+const toastTime = document.getElementById('toastTime');
+
+if (toast) {
+  const names = ['María', 'Juan', 'Sofía', 'Lucas', 'Camila', 'Matias', 'Florencia', 'Diego', 'Lucía', 'Agustín', 'Martina', 'Nicolás'];
+  const locations = ['de Bernal', 'de Quilmes', 'de Don Bosco', 'de Wilde', 'de Ezpeleta'];
+  const plans = ['Plan Inicial', 'Plan Refuerzo', 'Plan Integral', 'Plan Inicial']; // Weighting 'Plan Inicial'
+  const times = ['hace 5 minutos', 'hace 12 minutos', 'hace 25 minutos', 'hace 1 hora', 'hace 2 horas'];
+
+  const showRandomToast = () => {
+    const randomName = names[Math.floor(Math.random() * names.length)];
+    const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+    const randomPlan = plans[Math.floor(Math.random() * plans.length)];
+    const randomTime = times[Math.floor(Math.random() * times.length)];
+
+    toastName.textContent = `${randomName} ${randomLocation}`;
+    toastPlan.textContent = randomPlan;
+    toastTime.textContent = randomTime;
+
+    toast.classList.add('show');
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 5000);
+  };
+
+  const initialDelay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000;
+  
+  setTimeout(() => {
+    showRandomToast();
+    
+    // Cycle every 15-25 seconds after the first one
+    setInterval(() => {
+      if (!toast.classList.contains('show')) {
+         showRandomToast();
+      }
+    }, Math.floor(Math.random() * (25000 - 15000 + 1)) + 15000);
+    
+  }, initialDelay);
+}
